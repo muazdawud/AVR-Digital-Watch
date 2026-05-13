@@ -38,6 +38,8 @@
 			*/
 #define 	SHORT_CLICK		(25)
 
+#define  	BUZZER_OVF   	(F_OVERFLOW / 5)
+
 
 static uint8_t DAY_OVF_ARRAY[] = {1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1};
 
