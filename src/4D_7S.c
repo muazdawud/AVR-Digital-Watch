@@ -85,6 +85,10 @@ ISR(_TIMER2_COMPA_) {
     	pattern |= 0x80;
     }
 
+    if(DPF[3] && (groundCount == 3)){
+    	pattern |= 0x80;
+    }
+
     if(Flick_Array[groundCount] && !Flick_Flag){
 
     	*LED_DISPLAY_PORT = 0;
@@ -165,11 +169,13 @@ void initLED_DISPLAY(volatile uint8_t *PORT_1, volatile uint8_t *PORT_2, uint8_t
 }
  
 
-void DISPLAY(uint16_t num){
+void DISPLAY(uint16_t num, uint8_t pm_check){
 
 	DISPLAY_reset();
 
 	extractNumber(num);
+
+	DPF[3] = pm_check;
 
 	_TCR2B_ |= (1 << _CS22_) | (1 << _CS21_) | (1 << _CS20_);
 	TCNT2 = 0x1E;
@@ -221,7 +227,7 @@ void DISPLAY_nDP(uint16_t num){
 	TCNT2 = 0x1E;
 }
 
-void DISPLAY_flick(uint16_t number, uint16_t flick_number, uint8_t disable_dp){
+void DISPLAY_flick(uint16_t number, uint16_t flick_number, uint8_t disable_dp, uint8_t pm_check){
 	
 	DISPLAY_reset();
 
@@ -231,6 +237,8 @@ void DISPLAY_flick(uint16_t number, uint16_t flick_number, uint8_t disable_dp){
 		disable_decimal();
 	}
 
+	DPF[3] = pm_check;
+	
 	while(flick_number){
 
 		uint8_t digit = flick_number % 10;
