@@ -35,7 +35,7 @@ void setPin(const uint8_t ground[]);
 
 void initLED_DISPLAY(volatile uint8_t *PORT_1, volatile uint8_t *PORT_2, uint8_t dp_mask);
 
-void DISPLAY(uint16_t num);
+void DISPLAY(uint16_t num, uint8_t pm_check);
 
 /*
 	Go to the source implementation for some explanations
@@ -44,7 +44,7 @@ void DISPLAY_wChar(uint16_t character, uint8_t number);
 
 void DISPLAY_nDP(uint16_t num);
 
-void DISPLAY_flick(uint16_t number, uint16_t flick_number, uint8_t disable_dp);
+void DISPLAY_flick(uint16_t number, uint16_t flick_number, uint8_t disable_dp, uint8_t pm_check);
 
 void DISPLAY_reset();
 
