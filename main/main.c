@@ -4,7 +4,6 @@
 
 #include<avr/io.h>
 #include<avr/interrupt.h>
-#include<util/delay.h>
 #include<avr/power.h>
 #include<util/atomic.h>
 
@@ -21,6 +20,7 @@ volatile uint8_t setup_click = 0;
 volatile uint8_t setup_update = 0;
 volatile uint8_t setup_increase = 0;
 
+volatile uint8_t pm_indicator = 0;
 volatile static uint8_t hour = 10;
 volatile static uint8_t minute = 42; 
 volatile static uint8_t seconds = 0;
@@ -33,6 +33,9 @@ volatile uint8_t button_state = 0;
 volatile uint8_t button_click = 0;
 
 volatile uint16_t isr_flag = 0;
+volatile uint8_t buzzer_flag = 0;
+volatile uint8_t buzzer_counter = 0;
+volatile uint8_t endRun_flag = 0;
 
 volatile uint8_t power_on = 0;
 volatile uint8_t ovf_counter = 0;
@@ -71,7 +74,14 @@ ISR(_TIMER0_COMPA_){
 	    ovf_counter = 0;
 
 		seconds = (seconds + 1) % 60;
-		power_on = (power_on + 1) % OPR_TIME;
+
+		if(++power_on >= OPR_TIME){
+			power_on = 0;
+
+			if(endRun_flag == 1){
+				endRun_flag = 0;
+			}
+		}
 
 		if(!(seconds)){
 			minute = (minute + 1) % MINUTE_OVF;
@@ -80,11 +90,19 @@ ISR(_TIMER0_COMPA_){
 
 				if((++hour) == HOUR_OVF){
 					hour = 1;
+					pm_indicator ^= 1;
 				}
 
 				update_tnh = 1;
 			}
 		}
+	}
+
+	if((buzzer_flag) && ((++buzzer_counter) >= BUZZER_OVF)){
+
+		BUZZER_PORT &= ~(1 << BUZZER);
+		buzzer_flag = 0;
+		buzzer_counter = 0;
 	}
 
 	if(bit_is_clear(PB_PIN, PUSH_BUTTON)){
@@ -95,17 +113,23 @@ ISR(_TIMER0_COMPA_){
 	if(isr_flag){
 
 		if(bit_is_set(PB_PIN, PUSH_BUTTON)){
+
+			uint16_t check_isr = 0;
+
+			ATOMIC_BLOCK(ATOMIC_FORCEON){
+				check_isr = isr_flag;
+			}
 			 
-			if((!setup_flag) && ((isr_flag < (LONG_CLICK)) && (isr_flag > SHORT_CLICK))){
+			if((!setup_flag) && ((check_isr < (LONG_CLICK)) && (check_isr > SHORT_CLICK))){
 				
 					button_state = 1;
 					setup_update = 0;
 					setup_flag = 0;
 					setup_click = 0;
 				
-			}else if(display_on && (isr_flag > SHORT_CLICK)){
+			}else if(display_on && (check_isr > SHORT_CLICK)){
 
-				if((isr_flag < (LONG_CLICK))){
+				if((check_isr < (LONG_CLICK))){
 					setup_increase = 1;
 				}
 
@@ -141,20 +165,25 @@ int main(void){
 	PB_DDR &= ~(1 << PUSH_BUTTON);
 	PB_PORT |= (1 << PUSH_BUTTON);
 
+	BUZZER_DDR |= (1 << BUZZER);
+
 	day_ovf = DAY_OVF(month, year);
 
 	while(1){
 
 		if(button_state){
 
-			init4D_7S();
-
+			if(!display_on){
+				init4D_7S();
+				BUZZER_PORT |= (1 << BUZZER);
+			}
+			
 			power_on = 1;
 
 			switch(button_click){
 				case 0:{
 					display_number = (hour*100) + (minute);
-					DISPLAY(display_number);
+					DISPLAY(display_number, pm_indicator);
 					break;
 				}
 				case 1:{
@@ -192,7 +221,7 @@ int main(void){
 			update_tnh = 0;
 		}
 
-		if(!power_on){
+		if(!power_on && !endRun_flag){
 			DISPLAY_reset();
 			endRun();
 		}
@@ -222,11 +251,20 @@ static inline void init4D_7S(void){
 	LED_LIVE_DDR |= (0xff);
 	LED_GROUND_DDR |= (0xf);
 
+	endRun_flag = 1;
+	buzzer_counter = 0;
+	buzzer_flag = 1;
 	display_on = 1;
 }
 
 
 static inline void endRun(void){
+
+	endRun_flag = 2;
+
+	buzzer_counter = 0;
+	buzzer_flag = 1;
+	BUZZER_PORT |= (1 << BUZZER);
 
 	LED_LIVE_DDR &= ~(0xff);
 	LED_GROUND_DDR &= ~(0xf);
@@ -250,6 +288,7 @@ static inline void handleSetup(void){
 		case 0:{
 			if((++hour) >= (HOUR_OVF)){
 				hour = 1;
+				pm_indicator ^= 1;
 			}
 			break;
 		}
@@ -297,29 +336,29 @@ static void setupWatch(void){
 		switch(setup_click){
 			case 0:{
 				display_number = (hour*100) + (minute);
-				DISPLAY_flick(display_number, 12, 0);
+				DISPLAY_flick(display_number, 12, 0, pm_indicator);
 				break;
 			}
 			case 1:{
 				display_number = (hour*100) + (minute);
-				DISPLAY_flick(display_number, 34, 0);
+				DISPLAY_flick(display_number, 34, 0, pm_indicator);
 				break;
 			}
 			case 2:{
 				display_number = (day*100) + (month);
-				DISPLAY_flick(display_number, 12, 1);
+				DISPLAY_flick(display_number, 12, 1, 0);
 				break;
 			}
 			case 3:{
 				display_number = (day*100) + (month);
-				DISPLAY_flick(display_number, 34, 1);
+				DISPLAY_flick(display_number, 34, 1, 0);
 				break;
 			}
 			case 4:{
 				ATOMIC_BLOCK(ATOMIC_FORCEON){
 					display_number = (year);
 				}
-				DISPLAY_flick(year, 1234, 1);
+				DISPLAY_flick(year, 1234, 1, 0);
 				break;
 			}
 		}
