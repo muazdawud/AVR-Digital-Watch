@@ -1,78 +1,165 @@
 # Changelog
 
-All notable changes to the **DHT_11 Library** will be documented in this file.
+All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)  
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
----
-
-## [1.0.0] - 2026-04-22
-
-### Added
-- Initial release of the DHT_11 high-performance AVR library.
-- Interrupt-driven communication using **Pin Change Interrupts (PCINT)**.
-- Timer1-based pulse width measurement for accurate bit detection.
-- Full implementation of DHT11 communication protocol (40-bit data handling).
-- Support for:
-  - Humidity (integer + decimal).
-  - Temperature (integer + decimal).
-- Checksum validation for data integrity.
-- Overflow guard mechanism (`timerGuard`) to prevent rapid re-reading.
-- Bitwise data assembly using a 32-bit buffer (`temp_nd_hum_data`).
-- Separate checksum buffer handling (8-bit).
-- Support for multiple AVR ports:
-  - `_PORT_B`, `_PORT_C`, `_PORT_D`
-- Custom pin abstraction macros (`P0`–`P7`)
-- Configurable timing macros:
-  - `MCU_BD_LOW`
-  - `MCU_BD_HIGH`
-  - `DHT_READ_DELAY`
-  - `DHT_HI_LO_THRESHOLD`
-  - `DHT_OVF_THRESHOLD`
-- Internal fail-safe restore mechanism for corrupted reads.
-- Low-level register manipulation for maximum performance.
-- Example implementation with USART output.
-- MIT License.
+The format of this changelog is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows a custom development-oriented versioning structure.
 
 ---
 
-### Technical Details
-- Uses **Timer/Counter1** with prescaler of `8`.
-- PCINT ISR required for signal edge detection.
-- MSB-first bit parsing.
-- Dynamic threshold calculation based on `F_CPU`.
-- Efficient memory usage (no arrays for bit storage).
-- Uses volatile variables for ISR-safe operations.
+# [v1.0.0] - 2026-05-11
+
+## Initial Release
+
+First complete release of the AVR Digital Watch project featuring a fully interrupt-driven architecture, custom display multiplexing library, and custom DHT11 communication stack.
 
 ---
 
-### Known Limitations
-- Supports only DHT11 (no DHT22/AM2302 yet).
-- Requires manual ISR setup by the user.
-- Blocking delay used during read cycle (`_delay_ms`).
-- No multi-sensor support.
-- No abstraction layer (bare-metal AVR only).
+## Added
+
+### Core Watch System
+- Implemented a complete digital watch firmware for AVR microcontrollers.
+- Added support for:
+  - Time display
+  - Date display
+  - Temperature display
+  - Humidity display
+- Added automatic time progression using TIMER0 compare-match interrupts.
+- Added AM/PM indicator handling.
+- Added automatic minute and hour rollover logic.
+- Added month/day/year management logic.
 
 ---
 
-## [Unreleased]
-
-### Planned
-- Add support for **DHT22 / AM2302**.
-- Introduce non-blocking read API.
-- Multi-sensor support (multiple pins/devices).
-- Optional Arduino-compatible wrapper.
-- Improved error reporting (status codes instead of silent fallback).
-- Configurable timeout and retry mechanisms.
-- Optional floating-point output for decimal precision.
+### Custom 4D_7S Library
+- Developed a fully custom 4-digit 7-segment multiplexing library.
+- Added TIMER2 interrupt-driven multiplexing.
+- Added support for:
+  - Decimal point masking
+  - PM indicator display
+  - Character rendering
+  - Flickering digit animation
+  - Dynamic display updates
+- Added display reset and state recovery logic.
+- Added configurable digit-ground mapping using `setPin()`.
+- Added optimized multiplexing timing for reduced ISR latency.
 
 ---
 
-## Author
+### Custom DHT_11 Library
+- Developed a fully custom DHT11 communication interface.
+- Added:
+  - Pin Change Interrupt (PCINT) signal decoding
+  - Timer-based pulse width analysis
+  - Checksum verification
+  - Overflow protection
+  - Timing guards against rapid polling
+- Added support for:
+  - Temperature reading
+  - Humidity reading
+- Added restore-point fallback values on checksum failure.
+- Implemented low-level timing analysis using TIMER1.
 
-**Dauda Muazu Sulaiman**  
-Organization: **KibrisOrder**  
-https://ss.kibrisorder.com
+---
+
+### Interrupt-Driven Architecture
+- Implemented ISR-based scheduling for:
+  - Time updates
+  - Display multiplexing
+  - Button press timing
+  - DHT11 signal handling
+  - Buzzer timing
+- Reduced blocking operations throughout the firmware.
+- Added atomic operations for shared ISR variables using:
+  - `ATOMIC_BLOCK(ATOMIC_FORCEON)`
+
+---
+
+### Setup Interface
+- Added setup/configuration mode for:
+  - Hour
+  - Minute
+  - Day
+  - Month
+  - Year
+- Added:
+  - Long-click detection
+  - Short-click detection
+  - Increment handling
+  - Flickering edit indicators
+- Added setup state machine logic.
+
+---
+
+### Power Management
+- Added automatic display shutdown after inactivity.
+- Added runtime tracking using overflow counters.
+- Added dynamic enabling/disabling of:
+  - Display drivers
+  - Display grounds
+- Added startup/shutdown buzzer notification.
+
+---
+
+### Buzzer System
+- Added buzzer activation on:
+  - Display startup
+  - Power-down events
+- Added timer-controlled buzzer timeout logic.
+
+---
+
+### Hardware Support
+- Added support for:
+  - ATmega328P
+  - Common-anode 4-digit 7-segment displays
+  - DHT11 sensor
+  - Passive buzzer
+  - Push-button control interface
+
+---
+
+### Documentation
+- Added comprehensive project README.
+- Added:
+  - Architecture explanation
+  - ISR workflow documentation
+  - Hardware overview
+  - Firmware design notes
+
+---
+
+## Optimized
+
+### Performance
+- Reduced display ISR timing overhead.
+- Optimized multiplex refresh intervals.
+- Reduced unnecessary display refresh operations.
+- Minimized runtime polling operations.
+
+---
+
+## Removed
+
+### Cancelled Features
+The following planned hardware features were intentionally removed from the final implementation:
+
+- Potentiometer-based brightness adjustment
+- LED array subsystem
+- Ambient-light adaptive control system
+
+---
+
+### [Unreleased]
+
+---
+
+## Notes
+
+This project was designed as:
+- A low-level embedded systems exercise.
+- A reusable AVR firmware architecture reference.
+- A demonstration of interrupt-driven embedded programming without dependency on external frameworks.
+
+All major libraries included in the project are fully custom/self-developed and designed to operate safely within interrupt-driven environments.
 
 ---
