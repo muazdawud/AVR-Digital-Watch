@@ -679,6 +679,7 @@ It is a watch, a sensor display, and a compact embedded UI project all in one.
 ## License & Acknowledgements
 
 Author: Dauda Muazu Sulaiman
+
 Organization: [KibrisOrder](https://ss.kibrisorder.com)
 
 All libraries (`4D_7S`, `DHT_11`) are released under the MIT License – see the LICENSE file in the project root.
