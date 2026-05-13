@@ -107,7 +107,7 @@ The buzzer is used as a simple interaction cue when the display wakes and when t
 
 Circuit schematic is shown below:
 
-![Project Schematic Diagram](asset\Digital_Watch_Schematic.png)
+![Project Schematic Diagram](asset/Digital_Watch_Schematic.png)
 
 Some pictures of working circuit:
 
