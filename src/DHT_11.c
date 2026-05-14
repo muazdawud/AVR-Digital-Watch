@@ -21,7 +21,7 @@
 #include "DHT_11.h"
 #include "reg_defs_t.h"
  
-
+ 
 /*
 	The DHT_Device struct that is used to store and reference
 	the PORT, PIN, DDR and the bit position of the corresponding

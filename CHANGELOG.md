@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format of this changelog is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows a custom development-oriented versioning structure.
 
 ---
-
+ 
 # [v1.0.0] - 2026-05-11
 
 ## Initial Release

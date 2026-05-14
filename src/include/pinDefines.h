@@ -1,10 +1,20 @@
 /*
- * Original Author: Dauda Muazu Sulaiman
+ * _PIN_DEFINES_ Header - Platform Integration Layer
+ * * Copyright (c) 2026 Dauda Muazu Sulaiman
+ * * Copyright (c) 2026 KibrisOrder                <https://ss.kibrisorder.com>
+ * * Author: Dauda Muazu Sulaiman
+ * * Organization: KibrisOrder
+ * * All rights reserved.
+ * * This software is licensed under the MIT License.
+ * See the LICENSE file in the project root for full license information.
  */
 
 // ---------------
 //   Pin Defines
 // ---------------
+
+#ifndef 	_PIN_DEFINES_
+#define 	_PIN_DEFINES_
 
 /*
 	LED RELATED PIN_DEFS...
@@ -18,7 +28,7 @@
 #define 	LED_GP2				PB1
 #define     LED_GP3 			PB2
 #define  	LED_GP4 			PB3
-
+ 
 
 /*
 	DHT_11 RELATED PIN_DEFS
@@ -72,3 +82,6 @@
 #define 	LA2				PC3
 #define 	LA3 			PC4
 #define 	LA4 			PC5
+
+
+#endif /* _PIN_DEFINES_ */

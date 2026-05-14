@@ -5,7 +5,7 @@ A custom AVR-based digital watch project built around interrupt-driven firmware,
 The current implementation intentionally focuses on the final working feature set. The potentiometer and LED-array ideas were dropped/cancelled, and the firmware now revolves around the watch, sensor reading, buzzer feedback, and display control only. Future builds might include advanced features like time polling from a NTP server, alarm clock etc.
 
 ---
-
+ 
 ## Features
 
 - **Real‑time clock** with hours, minutes, seconds, day, month, and year (supports leap years).
