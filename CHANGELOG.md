@@ -153,6 +153,12 @@ The following planned hardware features were intentionally removed from the fina
 
 ---
 
+### Planned
+- Add an Alarm Settting, integration using buzzer.
+- Revise the DHT11 library implementation and usage.
+
+---
+
 ## Notes
 
 This project was designed as:
